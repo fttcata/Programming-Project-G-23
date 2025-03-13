@@ -1,1 +1,35 @@
+ArrayList<Flight> flights = new ArrayList<>();
+
+void setup() {
+  size(800, 600); // Adjust canvas size
+  loadFlightData("flights100k.csv"); // Read data
+}
+
+void draw() {
+  background(0); // Black background
+  fill(255); 
+  textSize(14);
+  
+  float y = 20;
+  for (Flight f : flights) {
+    f.display(50, y);
+    y += 20;
+  }
+}
+
+// Reads data from file
+void loadFlightData(String filename) {
+  String[] rows = loadStrings(filename);
+  for (int i = 1; i < rows.length; i++) { // Skip header row
+    String[] cols = split(rows[i], ",");
+    if (cols.length >= 16) { // Ensure row has enough columns
+      Flight f = new Flight(cols[0], cols[1], cols[2], cols[3], cols[4], 
+                            cols[5], cols[6], cols[7], cols[8], cols[9], 
+                            cols[10], cols[11], cols[12], cols[13], cols[14], cols[15]);
+      flights.add(f);
+    }
+  }
+  println("Loaded " + flights.size() + " flights.");
+}
+
 
