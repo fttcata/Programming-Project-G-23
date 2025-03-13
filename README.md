@@ -4,3 +4,4 @@
 3. Adam Kenny
 4. Phillip Gershovich
 5. Uzoma Eze-E
+6. Kai Hosokawa
