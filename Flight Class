@@ -41,6 +41,6 @@ class Flight {
   
   void display(float x, float y) {
     fill(255,255,255); 
-    text(flightDate + " " + carrier + " " + carrierNum + " " + origin + " -> " + destination, x, y);
+    text(flightDate + " " + carrier + " " + carrierNum + " " + origin + " -> " + destinationCity, x, y);
   }
 }
