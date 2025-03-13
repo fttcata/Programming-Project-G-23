@@ -1,0 +1,46 @@
+class Flight {
+  String flightDate;
+  String carrier;
+  String carrierNum;
+  String origin;
+  String originCity;
+  String originState;
+  String originWac;
+  String destination;
+  String destinationCity;
+  String destinationState;
+  String destinationWac;
+  String departureTime;
+  String arrivalTime;
+  String cancelled;
+  String diverted;
+  String distance;
+  
+  Flight(String flightDate, String carrier, String carrierNum, String origin, String originCity, 
+         String originState, String originWac, String destination, String destinationCity, 
+         String destinationState, String destinationWac, String departureTime, String arrivalTime, 
+         String cancelled, String diverted, String distance) {
+    this.flightDate = flightDate;
+    this.carrier = carrier;
+    this.carrierNum = carrierNum;
+    this.origin = origin;
+    this.originCity = originCity;
+    this.originState = originState;
+    this.originWac = originWac;
+    this.destination = destination;
+    this.destinationCity = destinationCity;
+    this.destinationState = destinationState;
+    this.destinationWac = destinationWac;
+    this.departureTime = departureTime;
+    this.arrivalTime = arrivalTime;
+    this.cancelled = cancelled;
+    this.diverted = diverted;
+    this.distance = distance;
+  }
+  
+  
+  void display(float x, float y) {
+    fill(255,255,255); 
+    text(flightDate + " " + carrier + " " + carrierNum + " " + origin + " -> " + destination, x, y);
+  }
+}
