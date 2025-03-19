@@ -1,1 +1,147 @@
+// main class 
 
+ArrayList<Flight> flights = new ArrayList<>();
+ChartDraw distanceChart;
+ChartDraw originChart;
+ChartDraw destinationChart;
+
+void setup() {
+  size(1200, 800); // Increased width to accommodate multiple charts
+  loadFlightData("flights100k(1).csv"); // Load flight data from CSV
+  ProcessingQueries pq = new ProcessingQueries(flights);
+
+  // Count flights by origin airport (grouped into ranges)
+  ArrayList<String> origins = new ArrayList<>();
+  ArrayList<Integer> originCounts = new ArrayList<>();
+  pq.countFlightByOriginAirport(origins, originCounts);
+  ArrayList<String> originRanges = new ArrayList<>();
+  ArrayList<Integer> originRangeCounts = new ArrayList<>();
+  groupDataIntoRanges(origins, originCounts, originRanges, originRangeCounts, 10); // Group into ranges of 10
+
+  // Count flights by destination airport (grouped into ranges)
+  ArrayList<String> destinations = new ArrayList<>();
+  ArrayList<Integer> destinationCounts = new ArrayList<>();
+  pq.countFlightByDestinationAirport(destinations, destinationCounts);
+  ArrayList<String> destinationRanges = new ArrayList<>();
+  ArrayList<Integer> destinationRangeCounts = new ArrayList<>();
+  groupDataIntoRanges(destinations, destinationCounts, destinationRanges, destinationRangeCounts, 10); // Group into ranges of 10
+
+  // Count flights by distance
+  ArrayList<String> distanceCategories = new ArrayList<>();
+  ArrayList<Integer> distanceCounts = new ArrayList<>();
+  pq.countFlightByDistance(distanceCategories, distanceCounts);
+
+  // Initialize charts
+  distanceChart = new ChartDraw(distanceCategories, distanceCounts);
+  originChart = new ChartDraw(originRanges, originRangeCounts);
+  destinationChart = new ChartDraw(destinationRanges, destinationRangeCounts);
+}
+
+void draw() {
+  background(0);
+  fill(255);
+  textSize(22);
+  textAlign(CENTER);
+
+  // Draw flight distance distribution chart
+  text("Flight Distance Distribution", width / 4, 50);
+  distanceChart.drawBarChart(50, 100, 300, 400);
+
+  // Draw origin airport distribution chart (grouped into ranges)
+  text("Flights by Origin Airport (Ranges)", width / 2, 50);
+  originChart.drawBarChart(400, 100, 300, 400);
+
+  // Draw destination airport distribution chart (grouped into ranges)
+  text("Flights by Destination Airport (Ranges)", 3 * width / 4, 50);
+  destinationChart.drawBarChart(750, 100, 300, 400);
+
+  // Display flight details (optional, if you still want to show them)
+  float y = 550;
+  for (int i = 0; i < 20; i++) {
+    flights.get(i).display(50, y);
+    y += 20;
+  }
+}
+
+void loadFlightData(String filename) {
+  String[] rows = loadStrings(filename);
+  for (int i = 1; i < rows.length; i++) {
+    String[] cols = split(rows[i], ",");
+    if (cols.length >= 16) {
+      Flight f = new Flight(cols[0], cols[1], cols[2], cols[3], cols[4],
+          cols[5], cols[6], cols[7], cols[8], cols[9],
+          cols[10], cols[11], cols[12], cols[13], cols[14], cols[15]);
+      flights.add(f);
+    }
+  }
+  println("Loaded " + flights.size() + " flights.");
+}
+
+// Helper function to group data into ranges
+void groupDataIntoRanges(ArrayList<String> labels, ArrayList<Integer> counts,
+                         ArrayList<String> rangeLabels, ArrayList<Integer> rangeCounts, int rangeSize) {
+  int maxCount = 0;
+  for (int count : counts) {
+    if (count > maxCount) {
+      maxCount = count;
+    }
+  }
+
+  // Create ranges
+  for (int i = 0; i < maxCount; i += rangeSize) {
+    int rangeStart = i;
+    int rangeEnd = i + rangeSize - 1;
+    rangeLabels.add(rangeStart + " - " + rangeEnd);
+    rangeCounts.add(0);
+  }
+
+  // Count values in each range
+  for (int i = 0; i < counts.size(); i++) {
+    int count = counts.get(i);
+    int rangeIndex = count / rangeSize;
+    if (rangeIndex >= rangeCounts.size()) {
+      rangeIndex = rangeCounts.size() - 1; // Handle values exceeding the last range
+    }
+    rangeCounts.set(rangeIndex, rangeCounts.get(rangeIndex) + 1);
+  }
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+// chartdraw class
+
+class ChartDraw {
+  ArrayList<String> labels;
+  ArrayList<Integer> values;
+
+  ChartDraw(ArrayList<String> labels, ArrayList<Integer> values) {
+    this.labels = labels;
+    this.values = values;
+  }
+
+  void drawBarChart(float x, float y, float chartWidth, float chartHeight) {
+    // Manually find the maximum value
+    int maxVal = 0;
+    for (int val : values) {
+      if (val > maxVal) {
+        maxVal = val;
+      }
+    }
+
+    float barWidth = chartWidth / values.size();
+
+    for (int i = 0; i < values.size(); i++) {
+      float barHeight = map(values.get(i), 0, maxVal, 0, chartHeight);
+      fill(100, 150, 255); // Bar color
+      rect(x + i * barWidth, y + chartHeight - barHeight, barWidth - 5, barHeight);
+
+      // Draw labels and values
+      fill(255);
+      textSize(12);
+      textAlign(CENTER);
+      text(labels.get(i), x + i * barWidth + barWidth / 2, y + chartHeight + 15); // Label below bar
+      text(values.get(i), x + i * barWidth + barWidth / 2, y + chartHeight - barHeight - 5); // Value above bar
+    }
+  }
+}
