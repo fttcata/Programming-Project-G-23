@@ -1,5 +1,6 @@
 ArrayList<Flight> flights = new ArrayList<>();
 ChartDraw chart;
+FlightDataManager flightManager;
 
 void setup() {
   size(800, 600);
