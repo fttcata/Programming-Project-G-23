@@ -1,4 +1,68 @@
 class ProcessingQueries
 {
+  ArrayList<Flight> flights;
+  ProcessingQueries(ArrayList<Flight> flights)
+  {
+   this.flights=flights;
+  }
+  
+  void countFlightByOriginAirport(ArrayList<String> originAirport, ArrayList<Integer> counts)
+  {
+    for (Flight f : flights)
+    {
+      String origin = f.origin;
+      int index = originAirport.indexOf(origin);
+      if (index != -1)
+      {
+        counts.set(index, counts.get(index) + 1);
+      }
+      else
+      {
+       originAirport.add(origin);
+       counts.add(1);
+      }
+    }
+  }
+  
+  void countFlightByDestinationAirport(ArrayList<String> destinationAirport, ArrayList<Integer> count)
+  {
+    for (Flight f : flights)
+    {
+      String destination = f.destination;
+      int index = destinationAirport.indexOf(destination);
+      if ( index != -1 )
+      {
+        count.set(index, count.get(index) + 1 );
+      }
+      else
+      {
+        destinationAirport.add(destination);
+        count.add(1);
+      }
+    }
+  }
+  void countFlightByDistance(ArrayList<String> flightDistance, ArrayList<Integer> count) {
+    String[] categories = { "< 1000 km", "1000 - 1999 km", "2000 - 2999 km", "3000+ km" };
+    int[] categoryCounts = { 0, 0, 0, 0 }; 
 
+    for (Flight f : flights) {
+      int distance = Integer.parseInt(f.distance);
+
+      if (distance < 1000) {
+        categoryCounts[0]++;
+      } else if (distance < 2000) {
+        categoryCounts[1]++;
+      } else if (distance < 3000) {
+        categoryCounts[2]++;
+      } else {
+        categoryCounts[3]++;
+      }
+    }
+
+   
+    for (int i = 0; i < categories.length; i++) {
+      flightDistance.add(categories[i]);
+      count.add(categoryCounts[i]);
+    }
+  }   
 }
