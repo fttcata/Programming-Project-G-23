@@ -1,4 +1,34 @@
-class ChartDraw
-{
+class ChartDraw {
+  ArrayList<String> labels;
+  ArrayList<Integer> values;
+  
+  ChartDraw(ArrayList<String> labels, ArrayList<Integer> values) {
+    this.labels = labels;
+    this.values = values;
+  }
+  
+  void drawBarChart(float x, float y, float chartWidth, float chartHeight) {
+  // Manually find the maximum value
+  int maxVal = 0;
+  for (int val : values) {
+    if (val > maxVal) {
+      maxVal = val;
+    }
+  }
 
-}
+  float barWidth = chartWidth / values.size();
+  
+  for (int i = 0; i < values.size(); i++) {
+    float barHeight = map(values.get(i), 0, maxVal, 0, chartHeight);
+    fill(100, 150, 255);
+    rect(x + i * barWidth, y + chartHeight - barHeight, barWidth - 5, barHeight);
+    
+    fill(255);
+    textSize(12);
+    textAlign(CENTER);
+    text(labels.get(i), x + i * barWidth + barWidth / 2, y + chartHeight + 15);
+    text(values.get(i), x + i * barWidth + barWidth / 2, y + chartHeight - barHeight - 5);
+  }
+  }
+  }
+
