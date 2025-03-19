@@ -3,6 +3,20 @@ ArrayList<Flight> flights = new ArrayList<>();
 void setup() {
   size(800, 600); 
   loadFlightData("flights100k.csv");
+  ProcessingQueries pq = new ProcessingQueries(flights);
+
+  ArrayList<String> origins = new ArrayList<>();
+  ArrayList<Integer> originCounts = new ArrayList<>();
+  pq.countFlightByOriginAirport(origins, originCounts);
+
+
+  ArrayList<String> destinations = new ArrayList<>();
+  ArrayList<Integer> destinationCounts = new ArrayList<>();
+  pq.countFlightByDestinationAirport(destinations, destinationCounts);
+  
+  ArrayList<String> distanceCategories = new ArrayList<>();
+  ArrayList<Integer> distanceCounts = new ArrayList<>();
+  pq.countFlightByDistance(distanceCategories, distanceCounts);
 }
 
 void draw() {
@@ -30,4 +44,3 @@ void loadFlightData(String filename) {
   }
   println("Loaded " + flights.size() + " flights.");
 }
-
