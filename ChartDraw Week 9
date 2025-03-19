@@ -1,3 +1,4 @@
+
 class ChartDraw {
   ArrayList<String> labels;
   ArrayList<Integer> values;
@@ -7,8 +8,8 @@ class ChartDraw {
     this.values = values;
   }
   
-  void drawBarChart(float x, float y, float chartWidth, float chartHeight) {
-  // Manually find the maximum value
+ void drawBarChart(float x, float y, float chartWidth, float chartHeight) {
+  // Find max value manually
   int maxVal = 0;
   for (int val : values) {
     if (val > maxVal) {
@@ -26,9 +27,12 @@ class ChartDraw {
     fill(255);
     textSize(12);
     textAlign(CENTER);
-    text(labels.get(i), x + i * barWidth + barWidth / 2, y + chartHeight + 15);
-    text(values.get(i), x + i * barWidth + barWidth / 2, y + chartHeight - barHeight - 5);
-  }
-  }
-  }
 
+    // Ensure labels are inside the screen
+    float textX = max(x + i * barWidth + barWidth / 2, x + 30);
+    text(labels.get(i), textX, y + chartHeight + 15);
+    
+    text(values.get(i), textX, y + chartHeight - barHeight - 5);
+  }
+}
+  }
