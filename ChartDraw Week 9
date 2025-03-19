@@ -1,38 +1,55 @@
+ArrayList<Flight> flights = new ArrayList<>();
+ChartDraw chart;
 
-class ChartDraw {
-  ArrayList<String> labels;
-  ArrayList<Integer> values;
-  
-  ChartDraw(ArrayList<String> labels, ArrayList<Integer> values) {
-    this.labels = labels;
-    this.values = values;
+void setup() {
+  size(800, 600);
+  loadFlightData("flights100k(1).csv");
+  ProcessingQueries pq = new ProcessingQueries(flights);
+
+  ArrayList<String> origins = new ArrayList<>();
+  ArrayList<Integer> originCounts = new ArrayList<>();
+  pq.countFlightByOriginAirport(origins, originCounts);
+
+
+  ArrayList<String> destinations = new ArrayList<>();
+  ArrayList<Integer> destinationCounts = new ArrayList<>();
+  pq.countFlightByDestinationAirport(destinations, destinationCounts);
+ 
+ ArrayList<String> distanceCategories = new ArrayList<>();
+  ArrayList<Integer> distanceCounts = new ArrayList<>();
+  pq.countFlightByDistance(distanceCategories, distanceCounts);
+ 
+  chart = new ChartDraw(distanceCategories, distanceCounts);
+}
+
+
+void draw() {
+  background(0);
+  fill(255);
+  textSize(18);
+  text("Flight Distance Distribution", width / 2, 50);
+
+  // Move flight details to the right
+  float y = 20;
+  for (int i = 0; i < 20; i++) {
+    flights.get(i).display(150, y); // Changed 50 → 100 to shift right
+    y += 20;
   }
-  
- void drawBarChart(float x, float y, float chartWidth, float chartHeight) {
-  // Find max value manually
-  int maxVal = 0;
-  for (int val : values) {
-    if (val > maxVal) {
-      maxVal = val;
+
+  // Draw bar chart further right
+  chart.drawBarChart(300, 100, 450, 400);
+}
+
+void loadFlightData(String filename) {
+  String[] rows = loadStrings(filename);
+  for (int i = 1; i < rows.length; i++) {
+    String[] cols = split(rows[i], ",");
+    if (cols.length >= 16) {
+      Flight f = new Flight(cols[0], cols[1], cols[2], cols[3], cols[4],
+                            cols[5], cols[6], cols[7], cols[8], cols[9],
+                            cols[10], cols[11], cols[12], cols[13], cols[14], cols[15]);
+      flights.add(f);
     }
   }
-
-  float barWidth = chartWidth / values.size();
-  
-  for (int i = 0; i < values.size(); i++) {
-    float barHeight = map(values.get(i), 0, maxVal, 0, chartHeight);
-    fill(100, 150, 255);
-    rect(x + i * barWidth, y + chartHeight - barHeight, barWidth - 5, barHeight);
-    
-    fill(255);
-    textSize(12);
-    textAlign(CENTER);
-
-    // Ensure labels are inside the screen
-    float textX = max(x + i * barWidth + barWidth / 2, x + 30);
-    text(labels.get(i), textX, y + chartHeight + 15);
-    
-    text(values.get(i), textX, y + chartHeight - barHeight - 5);
-  }
+  println("Loaded " + flights.size() + " flights.");
 }
-  }
