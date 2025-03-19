@@ -1,10 +1,9 @@
 ArrayList<Flight> flights = new ArrayList<>();
 ChartDraw chart;
-FlightDataManager flightManager;
 
 void setup() {
   size(800, 600);
-  loadFlightData("flights100k.csv");
+  loadFlightData("flights100k(1).csv");
   ProcessingQueries pq = new ProcessingQueries(flights);
 
   ArrayList<String> origins = new ArrayList<>();
@@ -28,16 +27,17 @@ void draw() {
   background(0);
   fill(255);
   textSize(22);
-  text("Flight Distance Distribution", width / 2 - 100, 50);
-  
-  chart.drawBarChart(100, 100, 600, 400);
+  text("Flight Distance Distribution", width / 2, 50);
 
-  
+  // Move flight details to the right
   float y = 20;
   for (int i = 0; i < 20; i++) {
-    flights.get(i).display(50, y);
+    flights.get(i).display(100, y); // Changed 50 → 100 to shift right
     y += 20;
   }
+
+  // Draw bar chart further right
+  chart.drawBarChart(300, 100, 450, 400);
 }
 
 void loadFlightData(String filename) {
