@@ -1,0 +1,48 @@
+class FlightDataManager{  
+  ArrayList<Flight> flights;
+
+  FlightDataManager() {
+    flights = new ArrayList<>();
+  }
+
+  void loadFlightData(String filename) {
+    String[] rows = loadStrings(filename);
+    for (int i = 1; i < rows.length; i++) { 
+      String[] cols = split(rows[i], ",");
+      if (cols.length >= 16) { 
+        Flight f = new Flight(cols[0], cols[1], cols[2], cols[3], cols[4], 
+                              cols[5], cols[6], cols[7], cols[8], cols[9], 
+                              cols[10], cols[11], cols[12], cols[13], cols[14], cols[15]);
+        flights.add(f);
+      }
+    }
+    println("Loaded " + flights.size() + " flights.");
+  }
+
+  // Query flights by origin airport
+  ArrayList<Flight> getFlightsFrom(String originCode) {
+    ArrayList<Flight> results = new ArrayList<>();
+    for (Flight f : flights) {
+      if (f.origin.equals(originCode)) {
+        results.add(f);
+      }
+    }
+    return results;
+  }
+
+  // Query flights by destination city
+  ArrayList<Flight> getFlightsTo(String destinationCity) {
+    ArrayList<Flight> results = new ArrayList<>();
+    for (Flight f : flights) {
+      if (f.destinationCity.equalsIgnoreCase(destinationCity)) {
+        results.add(f);
+      }
+    }
+    return results;
+  }
+
+  // Get all flights
+  ArrayList<Flight> getAllFlights() {
+    return flights;
+  }
+}
