@@ -52,30 +52,34 @@ void drawDistanceChart() {
 }
 
 void drawOriginChart() {
-  // Draw origin chart
   ArrayList<String> origins = new ArrayList<>();
   ArrayList<Integer> originCounts = new ArrayList<>();
   pq.countFlightByOriginAirport(origins, originCounts);
-  ArrayList<String> originRanges = new ArrayList<>();
-  ArrayList<Integer> originRangeCounts = new ArrayList<>();
-  groupDataIntoRanges(origins, originCounts, originRanges, originRangeCounts, 10);
-  drawBarChart("Flights by Origin Airport (Ranges)", originRanges, originRangeCounts, 50, 100, 1000, 600);
+  
+  // Get the top 10 origins
+  ArrayList<String> topOrigins = new ArrayList<>();
+  ArrayList<Integer> topOriginCounts = new ArrayList<>();
+  getTopN(origins, originCounts, topOrigins, topOriginCounts, 10);
 
-  // Draw back button
+  drawBarChart("Top 10 Flights by Origin Airport", topOrigins, topOriginCounts, 100, 100, 1000, 600);
+  
+  // Back button
   drawButton("Back", 50, 700, 100, 50);
 }
 
 void drawDestinationChart() {
-  // Draw destination chart
   ArrayList<String> destinations = new ArrayList<>();
   ArrayList<Integer> destinationCounts = new ArrayList<>();
   pq.countFlightByDestinationAirport(destinations, destinationCounts);
-  ArrayList<String> destinationRanges = new ArrayList<>();
-  ArrayList<Integer> destinationRangeCounts = new ArrayList<>();
-  groupDataIntoRanges(destinations, destinationCounts, destinationRanges, destinationRangeCounts, 10);
-  drawBarChart("Flights by Destination Airport (Ranges)", destinationRanges, destinationRangeCounts, 50, 100, 1000, 600);
+  
+  // Get the top 10 destinations
+  ArrayList<String> topDestinations = new ArrayList<>();
+  ArrayList<Integer> topDestinationCounts = new ArrayList<>();
+  getTopN(destinations, destinationCounts, topDestinations, topDestinationCounts, 10);
 
-  // Draw back button
+  drawBarChart("Top 10 Flights by Destination Airport", topDestinations, topDestinationCounts, 100, 100, 1000, 600);
+  
+  // Back button
   drawButton("Back", 50, 700, 100, 50);
 }
 
@@ -177,70 +181,23 @@ void groupDataIntoRanges(ArrayList<String> labels, ArrayList<Integer> counts,
     rangeCounts.set(rangeIndex, rangeCounts.get(rangeIndex) + 1);
   }
 }
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-// chartdraw class
-
-class ChartWindow extends PApplet {
-  String title;
-  ArrayList<String> labels;
-  ArrayList<Integer> values;
-  float x, y, chartWidth, chartHeight;
-
-  ChartWindow(String title, ArrayList<String> labels, ArrayList<Integer> values,
-              float x, float y, float chartWidth, float chartHeight) {
-    this.title = title;
-    this.labels = labels;
-    this.values = values;
-    this.x = x;
-    this.y = y;
-    this.chartWidth = chartWidth;
-    this.chartHeight = chartHeight;
-    PApplet.runSketch(new String[] { this.getClass().getSimpleName() }, this);
+void getTopN(ArrayList<String> labels, ArrayList<Integer> counts, 
+             ArrayList<String> topLabels, ArrayList<Integer> topCounts, int N) {
+  
+  // Create a list of (label, count) pairs
+  ArrayList<int[]> sortedData = new ArrayList<>();
+  for (int i = 0; i < labels.size(); i++) {
+    sortedData.add(new int[] { i, counts.get(i) }); // Store index and count
   }
 
-  void settings() {
-    size(1000, 1000); // Size of each chart window
-  }
+  // Sort based on count in descending order
+  sortedData.sort((a, b) -> b[1] - a[1]); 
 
-  void setup() {
-    background(0);
-    fill(255);
-    textSize(22);
-    textAlign(CENTER);
-    text(title, width / 2, 30);
-    drawBarChart(x, y + 50, chartWidth, chartHeight); // Draw the chart
-  }
-
-  void drawBarChart(float x, float y, float chartWidth, float chartHeight) {
-  // Manually find the maximum value
-  int maxVal = 0;
-  for (int val : values) {
-    if (val > maxVal) {
-      maxVal = val;
-    }
-  }
-
-  float barWidth = chartWidth / values.size();
-
-  for (int i = 0; i < values.size(); i++) {
-    // Calculate bar height
-    float barHeight = map(values.get(i), 0, maxVal, 0, chartHeight);
-
-    // Draw the bar
-    fill(100, 150, 255); // Bar color
-    rect(x + i * barWidth, y + chartHeight - barHeight, barWidth - 5, barHeight);
-
-    // Draw labels below the bars
-    fill(255);
-    textSize(12);
-    textAlign(CENTER);
-    text(labels.get(i), x + i * barWidth + barWidth / 2, y + chartHeight + 20); // Label below bar
-
-    // Draw values above the bars
-    text(values.get(i), x + i * barWidth + barWidth / 2, y + chartHeight - barHeight - 10); // Value above bar
+  // Take the top N and properly assign the labels
+  for (int i = 0; i < min(N, sortedData.size()); i++) {
+    int index = sortedData.get(i)[0]; // Get original index
+    topLabels.add(labels.get(index)); // Correctly assign airport code
+    topCounts.add(counts.get(index)); // Correctly assign count
   }
 }
-}
+
