@@ -201,3 +201,68 @@ void getTopN(ArrayList<String> labels, ArrayList<Integer> counts,
   }
 }
 
+
+
+// chartdraw class
+
+class ChartWindow extends PApplet {
+  String title;
+  ArrayList<String> labels;
+  ArrayList<Integer> values;
+  float x, y, chartWidth, chartHeight;
+
+  ChartWindow(String title, ArrayList<String> labels, ArrayList<Integer> values,
+              float x, float y, float chartWidth, float chartHeight) {
+    this.title = title;
+    this.labels = labels;
+    this.values = values;
+    this.x = x;
+    this.y = y;
+    this.chartWidth = chartWidth;
+    this.chartHeight = chartHeight;
+    PApplet.runSketch(new String[] { this.getClass().getSimpleName() }, this);
+  }
+
+  void settings() {
+    size(1000, 1000); // Size of each chart window
+  }
+
+  void setup() {
+    background(0);
+    fill(255);
+    textSize(22);
+    textAlign(CENTER);
+    text(title, width / 2, 30);
+    drawBarChart(x, y + 50, chartWidth, chartHeight); // Draw the chart
+  }
+
+  void drawBarChart(float x, float y, float chartWidth, float chartHeight) {
+  // Manually find the maximum value
+  int maxVal = 0;
+  for (int val : values) {
+    if (val > maxVal) {
+      maxVal = val;
+    }
+  }
+
+  float barWidth = chartWidth / values.size();
+
+  for (int i = 0; i < values.size(); i++) {
+    // Calculate bar height
+    float barHeight = map(values.get(i), 0, maxVal, 0, chartHeight);
+
+    // Draw the bar
+    fill(100, 150, 255); // Bar color
+    rect(x + i * barWidth, y + chartHeight - barHeight, barWidth - 5, barHeight);
+
+    // Draw labels below the bars
+    fill(255);
+    textSize(12);
+    textAlign(CENTER);
+    text(labels.get(i), x + i * barWidth + barWidth / 2, y + chartHeight + 20); // Label below bar
+
+    // Draw values above the bars
+    text(values.get(i), x + i * barWidth + barWidth / 2, y + chartHeight - barHeight - 10); // Value above bar
+  }
+}
+}
