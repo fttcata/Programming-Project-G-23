@@ -6,8 +6,8 @@ ChartDraw originChart;
 ChartDraw destinationChart;
 
 void setup() {
-  size(1200, 800); // Increased width to accommodate multiple charts
-  loadFlightData("flights100k(1).csv"); // Load flight data from CSV
+  size(1200, 800); 
+  loadFlightData("flights100k.csv"); 
   ProcessingQueries pq = new ProcessingQueries(flights);
 
   // Count flights by origin airport (grouped into ranges)
@@ -16,7 +16,7 @@ void setup() {
   pq.countFlightByOriginAirport(origins, originCounts);
   ArrayList<String> originRanges = new ArrayList<>();
   ArrayList<Integer> originRangeCounts = new ArrayList<>();
-  groupDataIntoRanges(origins, originCounts, originRanges, originRangeCounts, 10); // Group into ranges of 10
+  groupDataIntoRanges(origins, originCounts, originRanges, originRangeCounts, 10);
 
   // Count flights by destination airport (grouped into ranges)
   ArrayList<String> destinations = new ArrayList<>();
@@ -144,44 +144,5 @@ void groupDataIntoRanges(ArrayList<String> labels, ArrayList<Integer> counts,
       rangeIndex = rangeCounts.size() - 1; // Handle values exceeding the last range
     }
     rangeCounts.set(rangeIndex, rangeCounts.get(rangeIndex) + 1);
-  }
-}
-
-
-
-// chartdraw class
-
-class ChartDraw {
-  ArrayList<String> labels;
-  ArrayList<Integer> values;
-
-  ChartDraw(ArrayList<String> labels, ArrayList<Integer> values) {
-    this.labels = labels;
-    this.values = values;
-  }
-
-  void drawBarChart(float x, float y, float chartWidth, float chartHeight) {
-    // Manually find the maximum value
-    int maxVal = 0;
-    for (int val : values) {
-      if (val > maxVal) {
-        maxVal = val;
-      }
-    }
-
-    float barWidth = chartWidth / values.size();
-
-    for (int i = 0; i < values.size(); i++) {
-      float barHeight = map(values.get(i), 0, maxVal, 0, chartHeight);
-      fill(100, 150, 255); // Bar color
-      rect(x + i * barWidth, y + chartHeight - barHeight, barWidth - 5, barHeight);
-
-      // Draw labels and values
-      fill(255);
-      textSize(12);
-      textAlign(CENTER);
-      text(labels.get(i), x + i * barWidth + barWidth / 2, y + chartHeight + 15); // Label below bar
-      text(values.get(i), x + i * barWidth + barWidth / 2, y + chartHeight - barHeight - 5); // Value above bar
-    }
   }
 }
