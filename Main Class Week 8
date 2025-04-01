@@ -1,105 +1,177 @@
 // main class 
-
 ArrayList<Flight> flights = new ArrayList<>();
-ChartDraw distanceChart;
-ChartDraw originChart;
-ChartDraw destinationChart;
-
-void setup() {
-  size(1200, 800); 
-  loadFlightData("flights100k.csv"); 
-  ProcessingQueries pq = new ProcessingQueries(flights);
-
-  // Count flights by origin airport (grouped into ranges)
-  ArrayList<String> origins = new ArrayList<>();
-  ArrayList<Integer> originCounts = new ArrayList<>();
-  pq.countFlightByOriginAirport(origins, originCounts);
-  ArrayList<String> originRanges = new ArrayList<>();
-  ArrayList<Integer> originRangeCounts = new ArrayList<>();
-  groupDataIntoRanges(origins, originCounts, originRanges, originRangeCounts, 10);
-
-  // Count flights by destination airport (grouped into ranges)
-  ArrayList<String> destinations = new ArrayList<>();
-  ArrayList<Integer> destinationCounts = new ArrayList<>();
-  pq.countFlightByDestinationAirport(destinations, destinationCounts);
-  ArrayList<String> destinationRanges = new ArrayList<>();
-  ArrayList<Integer> destinationRangeCounts = new ArrayList<>();
-  groupDataIntoRanges(destinations, destinationCounts, destinationRanges, destinationRangeCounts, 10); // Group into ranges of 10
-
-  // Count flights by distance
-  ArrayList<String> distanceCategories = new ArrayList<>();
-  ArrayList<Integer> distanceCounts = new ArrayList<>();
-  pq.countFlightByDistance(distanceCategories, distanceCounts);
-
-  // Initialize charts
-  distanceChart = new ChartDraw(distanceCategories, distanceCounts);
-  originChart = new ChartDraw(originRanges, originRangeCounts);
-  destinationChart = new ChartDraw(destinationRanges, destinationRangeCounts);
+ProcessingQueries pq;
+int currentScreen = 0; // 0 = main screen, 1 = distance chart, 2 = origin chart, 3 = destination chart
+PImage backgroundImage;
+PImage destinationImage;
+PImage originsImage;
+PImage distanceImage;
+PFont font;
+void setup() 
+{
+  backgroundImage = loadImage("background.png");
+  size(1200, 800);
+  font = createFont("Arial", 32, true);
+  textFont(font);
+  loadFlightData("flights100k.csv");
+  pq = new ProcessingQueries(flights);
+  destinationImage = loadImage("destination.jpg");
+  destinationImage.resize(1200,800);
+  originsImage = loadImage("origin.jpg");
+  originsImage.resize(1200,800);
+  distanceImage = loadImage("Distance.jpg");
+  distanceImage.resize(1200,800);
 }
-int buttonWidth = 200, buttonHeight = 50;
-String[] buttonLabels = { "Distance Chart", "Origin Chart", "Destination Chart" };
-int currentScreen = -1; // -1: Show buttons, 0: Distance, 1: Origin, 2: Destination
 
 void draw() {
   background(0);
+
+  if (currentScreen == 0) {
+    drawMainScreen();
+  } else if (currentScreen == 1) {
+    drawDistanceChart();
+  } else if (currentScreen == 2) {
+    drawOriginChart();
+  } else if (currentScreen == 3) {
+    drawDestinationChart();
+  }
+}
+
+void drawMainScreen() {
+  
+  backgroundImage.resize(1200,800);
+  background(backgroundImage);
+  // Display flight data
   fill(255);
+  textSize(16);
+  textAlign(LEFT);
+  text("Please choose the data type which you would like to see:", 50, 400);
+  fill(255);
+  textSize(20);
+  textAlign(CENTER);
+  text("Welcome to our flight data app where we took datas from 100k flights around the whole United States.", 600, 50);
+  fill(0);
+  textSize(20);
+  textAlign(RIGHT);
+  text("Made by Group 23", 1150, 750);
+  
+  // Draw buttons
+  drawButton("View Distance Chart", 50, 450, 300, 50);
+  drawButton("View Origin Chart", 50, 500, 300, 50);
+  drawButton("View Destination Chart", 50, 550, 300, 50);
+}
+
+void drawDistanceChart() {
+  // Draw distance chart
+  background(distanceImage);
+  ArrayList<String> distanceCategories = new ArrayList<>();
+  ArrayList<Integer> distanceCounts = new ArrayList<>();
+  pq.countFlightByDistance(distanceCategories, distanceCounts);
+  drawBarChart("Flight Distance Distribution", distanceCategories, distanceCounts, 50, 100, 1000, 600);
+
+  textSize(20);
+  textAlign(RIGHT);
+  text("Made by Group 23", 1150, 750);
+  // Draw back button
+  drawButton("Back", 50, 750, 100, 50);
+}
+
+void drawOriginChart() {
+  background(originsImage);
+  ArrayList<String> origins = new ArrayList<>();
+  ArrayList<Integer> originCounts = new ArrayList<>();
+  pq.countFlightByOriginAirport(origins, originCounts);
+  
+  // Get the top 10 origins
+  ArrayList<String> topOrigins = new ArrayList<>();
+  ArrayList<Integer> topOriginCounts = new ArrayList<>();
+  getTopN(origins, originCounts, topOrigins, topOriginCounts, 10);
+  textFont(font);
+  drawBarChart("Top 10 Flights by Origin Airport", topOrigins, topOriginCounts, 100, 100, 1000, 600);
+  textSize(20);
+  textAlign(RIGHT);
+  text("Made by Group 23", 1150, 750);
+  // Back button
+  drawButton("Back", 50, 750, 100, 50);
+}
+
+void drawDestinationChart() {
+  background(destinationImage);
+  ArrayList<String> destinations = new ArrayList<>();
+  ArrayList<Integer> destinationsCounts = new ArrayList<>();
+  pq.countFlightByDestinationAirport(destinations, destinationsCounts);
+  
+  // Get the top 10 origins
+  ArrayList<String> topDestinations = new ArrayList<>();
+  ArrayList<Integer> topDestinationCounts = new ArrayList<>();
+  getTopN(destinations, destinationsCounts, topDestinations, topDestinationCounts, 10);
+
+  drawBarChart("Top 10 Flights by Destination Airport", topDestinations, topDestinationCounts, 100, 100, 1000, 600);
+  textSize(20);
+  textAlign(RIGHT);
+  text("Made by Group 23", 1150, 750);
+  // Back button
+  drawButton("Back", 50, 750, 100, 50);
+}
+
+void drawBarChart(String title, ArrayList<String> labels, ArrayList<Integer> values, float x, float y, float chartWidth, float chartHeight) {
+  // Draw the bar chart
+  fill(0);
   textSize(22);
   textAlign(CENTER);
-  
- if (currentScreen == -1) {
-    // Show the buttons only
-    drawButtons();
-  } else {
-    // Draw the selected chart
-    if (currentScreen == 0) {
-      text("Flight Distance Distribution", width / 2, 100);
-      distanceChart.drawBarChart(300, 150, 600, 400);
-    } else if (currentScreen == 1) {
-      text("Flights by Origin Airport (Ranges)", width / 2, 100);
-      originChart.drawBarChart(300, 150, 600, 400);
-    } else if (currentScreen == 2) {
-      text("Flights by Destination Airport (Ranges)", width / 2, 100);
-      destinationChart.drawBarChart(300, 150, 600, 400);
+  text(title, width / 2, 30);
+
+  int maxVal = 0;
+  for (int val : values) {
+    if (val > maxVal) {
+      maxVal = val;
     }
-    
-    // Draw back button
-    drawBackButton();
+  }
+
+  float barWidth = chartWidth / values.size();
+
+  for (int i = 0; i < values.size(); i++) {
+    float barHeight = map(values.get(i), 0, maxVal, 0, chartHeight);
+    textFont(font);
+    fill(0, 0, 0, 100); // Bar color
+    rect(x + i * barWidth, y + chartHeight - barHeight, barWidth - 5, barHeight);
+
+    // Draw labels and values
+    fill(0);
+    textSize(12);
+    textAlign(CENTER);
+    text(labels.get(i), x + i * barWidth + barWidth / 2, y + chartHeight + 20); // Label below bar
+    text(values.get(i), x + i * barWidth + barWidth / 2, y + chartHeight - barHeight - 10); // Value above bar
   }
 }
 
-void drawButtons() {
-  for (int i = 0; i < 3; i++) {
-    fill(100, 150, 255);
-    rect(50 + i * (buttonWidth + 20), 200, buttonWidth, buttonHeight);
-    fill(255);
-    textSize(16);
-    textAlign(CENTER, CENTER);
-    text(buttonLabels[i], 50 + i * (buttonWidth + 20) + buttonWidth / 2, 200 + buttonHeight / 2);
-  }
-}
-
-void drawBackButton() {
-  fill(200, 50, 50);
-  rect(50, 50, 100, 40);
+void drawButton(String label, float x, float y, float w, float h) {
+  rectMode(CORNER);  
+  fill (0);
+  stroke(255, 0, 0);  // Red border for debugging
+  rect(x, y, w, h);  
+  noStroke();
+  
   fill(255);
   textSize(16);
   textAlign(CENTER, CENTER);
-  text("Back", 100, 70);
+  text(label, x + w / 2, y + h / 2);
 }
 
 void mousePressed() {
-  if (currentScreen == -1) {
-    // Check if any of the chart buttons are clicked
-    for (int i = 0; i < 3; i++) {
-      if (mouseX > 50 + i * (buttonWidth + 20) && mouseX < 50 + i * (buttonWidth + 20) + buttonWidth &&
-          mouseY > 200 && mouseY < 200 + buttonHeight) {
-        currentScreen = i;
-      }
+  if (currentScreen == 0) {
+    // Main screen buttons
+    if (mouseX > 50 && mouseX < 300 && mouseY > 450 && mouseY < 500) {
+      currentScreen = 1; // Distance chart
+    } else if (mouseX > 50 && mouseX < 300 && mouseY > 500 && mouseY < 550) {
+      currentScreen = 2; // Origin chart
+    } else if (mouseX > 50 && mouseX < 300 && mouseY > 550 && mouseY < 600) {
+      currentScreen = 3; // Destination chart
     }
   } else {
-    // Check if "Back" button is clicked
-    if (mouseX > 50 && mouseX < 150 && mouseY > 50 && mouseY < 90) {
-      currentScreen = -1; // Return to main menu
+    // Back button
+    if (mouseX > 50 && mouseX < 150 && mouseY > 750 && mouseY < 800) {
+      currentScreen = 0; // Return to main screen
     }
   }
 }
@@ -118,7 +190,6 @@ void loadFlightData(String filename) {
   println("Loaded " + flights.size() + " flights.");
 }
 
-// Helper function to group data into ranges
 void groupDataIntoRanges(ArrayList<String> labels, ArrayList<Integer> counts,
                          ArrayList<String> rangeLabels, ArrayList<Integer> rangeCounts, int rangeSize) {
   int maxCount = 0;
@@ -144,5 +215,24 @@ void groupDataIntoRanges(ArrayList<String> labels, ArrayList<Integer> counts,
       rangeIndex = rangeCounts.size() - 1; // Handle values exceeding the last range
     }
     rangeCounts.set(rangeIndex, rangeCounts.get(rangeIndex) + 1);
+  }
+}
+void getTopN(ArrayList<String> labels, ArrayList<Integer> counts, 
+             ArrayList<String> topLabels, ArrayList<Integer> topCounts, int N) {
+  
+  // Create a list of (label, count) pairs
+  ArrayList<int[]> sortedData = new ArrayList<>();
+  for (int i = 0; i < labels.size(); i++) {
+    sortedData.add(new int[] { i, counts.get(i) }); // Store index and count
+  }
+
+  // Sort based on count in descending order
+  sortedData.sort((a, b) -> b[1] - a[1]); 
+
+  // Take the top N and properly assign the labels
+  for (int i = 0; i < min(N, sortedData.size()); i++) {
+    int index = sortedData.get(i)[0]; // Get original index
+    topLabels.add(labels.get(index)); // Correctly assign airport code
+    topCounts.add(counts.get(index)); // Correctly assign count
   }
 }
