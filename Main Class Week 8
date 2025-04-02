@@ -49,16 +49,16 @@ void drawMainScreen() {
   fill(255);
   textSize(20);
   textAlign(CENTER);
-  text("Welcome to our flight data app where we took datas from 100k flights around the whole United States.", 600, 50);
+  text("Welcome to our flight data app where we took data from 100k flights around the whole United States.", 600, 50);
   fill(0);
   textSize(20);
   textAlign(RIGHT);
   text("Made by Group 23", 1150, 750);
   
   // Draw buttons
-  drawButton("View Distance Chart", 50, 450, 300, 50);
-  drawButton("View Origin Chart", 50, 500, 300, 50);
-  drawButton("View Destination Chart", 50, 550, 300, 50);
+  drawButton("View Top 10 Frequently Occuring Flight Distances Chart", 50, 450, 300, 50);
+  drawButton("View Top 10 Frequently Occuring Origin Airport Chart", 50, 500, 300, 50);
+  drawButton("View Top 10 Frequently Occuring Destination Airport Chart", 50, 550, 300, 50);
 }
 
 void drawDistanceChart() {
@@ -153,7 +153,7 @@ void drawButton(String label, float x, float y, float w, float h) {
   noStroke();
   
   fill(255);
-  textSize(16);
+  textSize(10);
   textAlign(CENTER, CENTER);
   text(label, x + w / 2, y + h / 2);
 }
