@@ -119,9 +119,13 @@ void drawDistanceChart() {
   pq.countFlightByDistance(distanceCategories, distanceCounts);
   drawBarChart("Flight Distance Distribution", distanceCategories, distanceCounts, 50, 100, 1000, 600);
 
+  textAlign(LEFT);
+  textSize(20);
+  text("Page 1/3", 50, 50);
   textSize(20);
   textAlign(RIGHT);
-  text("Made by Group 23", 1150, 750);
+  text("Made by Group 23", 1150, 700);
+  drawButton("Next", 1000, 750, 100,50);
   // Draw back button
   drawButton("Back", 50, 750, 100, 50);
 }
@@ -136,12 +140,16 @@ void drawOriginChart() {
   ArrayList<String> topOrigins = new ArrayList<>();
   ArrayList<Integer> topOriginCounts = new ArrayList<>();
   getTopN(origins, originCounts, topOrigins, topOriginCounts, 10);
+  textAlign(LEFT);
+  textSize(20);
+  text("Page 2/3", 50, 50);
   textFont(font);
   drawPieChart("Top 10 Flights by Origin Airport", topOrigins, topOriginCounts, width / 2, height / 2, 500);
   textSize(20);
   textAlign(RIGHT);
-  text("Made by Group 23", 1150, 750);
+  text("Made by Group 23", 1150, 700);
   // Back button
+  drawButton("Next", 1000, 750, 100, 50);
   drawButton("Back", 50, 750, 100, 50);
 }
 
@@ -157,10 +165,12 @@ void drawDestinationChart() {
   getTopN(destinations, destinationsCounts, topDestinations, topDestinationCounts, 10);
 
   drawLineChart("Top 10 Flights by Destination Airport", topDestinations, topDestinationCounts, 100, 100, 1000, 500);
-
+  textAlign(LEFT);
+  textSize(20);
+  text("Page 3/3", 50, 50);
   textSize(20);
   textAlign(RIGHT);
-  text("Made by Group 23", 1150, 750);
+  text("Made by Group 23", 1150, 700);
   // Back button
   drawButton("Back", 50, 750, 100, 50);
 }
@@ -314,8 +324,22 @@ void mousePressed() {
     }
   } else {
     // Back button
-    if (mouseX > 50 && mouseX < 150 && mouseY > 750 && mouseY < 800) {
+    if (mouseX > 50 && mouseX < 150 && mouseY > 750 && mouseY < 800 && currentScreen == 1) {
       currentScreen = 0; // Return to main screen
+    }
+    else if (mouseX > 1000 && mouseX < 1150 && mouseY > 750 && mouseY < 800 && currentScreen == 1)
+    {
+      currentScreen = 2;
+    }
+    else if (mouseX > 1000 && mouseX < 1150 && mouseY > 750 && mouseY < 800 && currentScreen == 2)
+    {
+      currentScreen = 3;
+    }
+    if (mouseX > 50 && mouseX < 150 && mouseY > 750 && mouseY < 800 && currentScreen == 2) {
+      currentScreen = 1; // Return to main screen
+    }
+    if (mouseX > 50 && mouseX < 150 && mouseY > 750 && mouseY < 800 && currentScreen == 3) {
+      currentScreen = 2; // Return to main screen
     }
   }
 }
