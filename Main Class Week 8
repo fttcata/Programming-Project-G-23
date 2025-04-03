@@ -9,7 +9,7 @@ PImage distanceImage;
 PFont font;
 void setup() 
 {
-  backgroundImage = loadImage("background.png");
+  backgroundImage = loadImage("background.jpg");
   size(1200, 800);
   font = createFont("Arial", 32, true);
   textFont(font);
@@ -19,7 +19,7 @@ void setup()
   destinationImage.resize(1200,800);
   originsImage = loadImage("origin.jpg");
   originsImage.resize(1200,800);
-  distanceImage = loadImage("Distance.jpg");
+  distanceImage = loadImage("distance.jpg");
   distanceImage.resize(1200,800);
 }
 
@@ -87,7 +87,7 @@ void drawOriginChart() {
   ArrayList<Integer> topOriginCounts = new ArrayList<>();
   getTopN(origins, originCounts, topOrigins, topOriginCounts, 10);
   textFont(font);
-  drawBarChart("Top 10 Flights by Origin Airport", topOrigins, topOriginCounts, 100, 100, 1000, 600);
+  drawPieChart("Top 10 Flights by Origin Airport", topOrigins, topOriginCounts, width / 2, height / 2, 500);
   textSize(20);
   textAlign(RIGHT);
   text("Made by Group 23", 1150, 750);
@@ -106,7 +106,8 @@ void drawDestinationChart() {
   ArrayList<Integer> topDestinationCounts = new ArrayList<>();
   getTopN(destinations, destinationsCounts, topDestinations, topDestinationCounts, 10);
 
-  drawBarChart("Top 10 Flights by Destination Airport", topDestinations, topDestinationCounts, 100, 100, 1000, 600);
+  drawLineChart("Top 10 Flights by Destination Airport", topDestinations, topDestinationCounts, 100, 100, 1000, 500);
+
   textSize(20);
   textAlign(RIGHT);
   text("Made by Group 23", 1150, 750);
@@ -145,6 +146,42 @@ void drawBarChart(String title, ArrayList<String> labels, ArrayList<Integer> val
   }
 }
 
+void drawPieChart(String title, ArrayList<String> labels, ArrayList<Integer> values, float centerX, float centerY, float diameter) {
+  // Draw the chart title
+  fill(0);
+  textSize(22);
+  textAlign(CENTER);
+  text(title, width / 2, 30);
+
+  // Total value
+  float total = 0;
+  for (int val : values) {
+    total += val;
+  }
+
+  float startAngle = 0;
+  for (int i = 0; i < values.size(); i++) {
+    float angle = map(values.get(i), 0, total, 0, TWO_PI);
+
+    // Assign unique color per slice
+    fill(100 + i * 30 % 255, 150 + i * 50 % 255, 200 + i * 70 % 255);
+    arc(centerX, centerY, diameter, diameter, startAngle, startAngle + angle, PIE);
+
+    // Calculate label position
+    float midAngle = startAngle + angle / 2;
+    float labelX = centerX + cos(midAngle) * diameter / 2.5;
+    float labelY = centerY + sin(midAngle) * diameter / 2.5;
+
+    fill(0);
+    textSize(12);
+    textAlign(CENTER, CENTER);
+    text(labels.get(i) + "\n(" + values.get(i) + ")", labelX, labelY);
+
+    startAngle += angle;
+  }
+}
+
+
 void drawButton(String label, float x, float y, float w, float h) {
   rectMode(CORNER);  
   fill (0);
@@ -157,6 +194,63 @@ void drawButton(String label, float x, float y, float w, float h) {
   textAlign(CENTER, CENTER);
   text(label, x + w / 2, y + h / 2);
 }
+
+void drawLineChart(String title, ArrayList<String> labels, ArrayList<Integer> values, float x, float y, float chartWidth, float chartHeight) {
+  fill(0);
+  textSize(22);
+  textAlign(CENTER);
+  text(title, width / 2, 30);
+
+  // Background box behind the chart
+  fill(245); // Light gray background
+  noStroke();
+  rect(x - 40, y - 20, chartWidth + 80, chartHeight + 60);
+
+  // Axis lines
+  stroke(0);
+  strokeWeight(1);
+  line(x, y, x, y + chartHeight);           // Y-axis
+  line(x, y + chartHeight, x + chartWidth, y + chartHeight); // X-axis
+
+  // Find max value
+  int maxVal = 0;
+  for (int val : values) {
+    if (val > maxVal) {
+      maxVal = val;
+    }
+  }
+
+  float pointSpacing = chartWidth / (values.size() - 1);
+
+  // Draw line chart
+  stroke(50, 100, 200);
+  strokeWeight(2);
+  noFill();
+  beginShape();
+  for (int i = 0; i < values.size(); i++) {
+    float px = x + i * pointSpacing;
+    float py = y + chartHeight - map(values.get(i), 0, maxVal, 0, chartHeight);
+    vertex(px, py);
+  }
+  endShape();
+
+  // Draw points and labels
+  fill(0);
+  textSize(12);
+  textAlign(CENTER);
+  for (int i = 0; i < values.size(); i++) {
+    float px = x + i * pointSpacing;
+    float py = y + chartHeight - map(values.get(i), 0, maxVal, 0, chartHeight);
+
+    fill(255, 0, 0);
+    ellipse(px, py, 8, 8);
+
+    fill(0);
+    text(values.get(i), px, py - 12); // value
+    text(labels.get(i), px, y + chartHeight + 15); // label
+  }
+}
+
 
 void mousePressed() {
   if (currentScreen == 0) {
